@@ -19,7 +19,7 @@ jobs:
 
       - name: Extract app folder
         run: |
-          unzip -o DiniyatMaktab_Mobile_APK_Build_v2.zip -d .
+          unzip -o DiniyatMaktab_Mobile_APK_Build_v2-1.zip -d .
           echo "Checking project files"
           ls -la
           ls -la app
