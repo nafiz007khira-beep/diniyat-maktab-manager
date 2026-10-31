@@ -1,0 +1,13 @@
+দ্বীনিয়াত মক্তব ম্যানেজার — মোবাইল থেকে APK তৈরির নিয়ম
+
+এই ZIP-এ Android Studio প্রজেক্ট এবং GitHub Actions দিয়ে ক্লাউডে APK তৈরির workflow আছে। APK এখনো তৈরি করা হয়নি।
+
+ধাপ ১: GitHub অ্যাকাউন্ট খুলুন/লগইন করুন: https://github.com
+ধাপ ২: + চাপুন → New repository → নাম দিন DiniyatMaktab → Create repository। Private রাখলেও হবে।
+ধাপ ৩: Add file → Upload files দিয়ে এই ZIP-এর ভেতরের ফাইল/ফোল্ডারগুলো আপলোড করুন। ZIP ফাইলটি নিজে আপলোড করবেন না; Extract করে ভেতরের সব ফাইল আপলোড করতে হবে। .github ফোল্ডারটিও অবশ্যই আপলোড করবেন।
+ধাপ ৪: Commit changes চাপুন।
+ধাপ ৫: Repository-র Actions ট্যাবে যান। “Build Diniyat Maktab APK” workflow চলবে। প্রথমবার অনুমতি/Enable workflows চাইলে চালু করুন।
+ধাপ ৬: কাজ শেষ হলে সবুজ টিক দেখাবে। Workflow run খুলে নিচে Artifacts থেকে Diniyat-Maktab-debug-APK ডাউনলোড করুন।
+ধাপ ৭: ZIP extract করে app-debug.apk ফাইলটি Android ফোনে ইনস্টল করুন। ফোনে “Install unknown apps” অনুমতি চাইলে শুধু আপনার ডাউনলোড করা APK-এর জন্য অনুমতি দিন।
+
+নোট: এটি debug APK; Play Store-এ প্রকাশের জন্য signed release APK নয়। GitHub-এ কোড আপলোড করার আগে ব্যক্তিগত তথ্য বা পাসওয়ার্ড যোগ করবেন না।
