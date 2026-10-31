@@ -1,0 +1,62 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Locate and extract nested app ZIP
+        shell: bash
+        run: |
+          set -e
+          ZIP_PATH="$(find . -type f \\( -iname 'app-folder.zip' -o -iname 'app-foldar.zip' \\) -print -quit)"
+          if [ -z "$ZIP_PATH" ]; then
+            echo "Could not find app-folder.zip or app-foldar.zip"
+            find . -maxdepth 3 -type f -print
+            exit 1
+          fi
+          echo "Extracting: $ZIP_PATH"
+          unzip -o "$ZIP_PATH" -d .
+
+          if [ ! -f "app/build.gradle" ]; then
+            echo "app/build.gradle was not found after extraction."
+            find . -maxdepth 4 -type f -print
+            exit 1
+          fi
+
+          if [ ! -f "settings.gradle" ] && [ ! -f "settings.gradle.kts" ]; then
+            echo "settings.gradle is missing from the project root."
+            exit 1
+          fi
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK
+        run: gradle --no-daemon --stacktrace assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DiniyatMaktab-debug-APK
+          path: '**/build/outputs/apk/debug/*.apk'
+          if-no-files-found: error
