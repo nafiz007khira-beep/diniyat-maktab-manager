@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123d32">
+<link rel="manifest" href="manifest.json">
+<title>দ্বীনিয়াত মক্তব ম্যানেজার</title>
+<style>
+:root{--green:#123d32;--green2:#1b604c;--bg:#f3f6f4;--card:#fff;--muted:#65736c;--line:#e2e9e4;--gold:#e6c77d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,"Noto Sans Bengali",sans-serif;color:#17231d}
+header{background:var(--green);color:white;padding:20px 16px 18px;border-radius:0 0 20px 20px}
+header .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{font-size:20px;margin:0}header p{margin:6px 0 0;color:#d8e8df;font-size:13px}
+main{max-width:760px;margin:auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:14px;margin:12px 0;box-shadow:0 2px 8px #153d3210}
+label{font-size:13px;color:var(--muted);display:block;margin:9px 0 5px}
+input,select,button{font:inherit}input,select{width:100%;padding:11px;border:1px solid #ccd8d0;border-radius:10px;background:#fff;color:#17231d}
+button{border:0;border-radius:10px;padding:11px 13px;background:var(--green2);color:white;font-weight:650;cursor:pointer}
+button.secondary{background:#eaf1ed;color:var(--green)}button.danger{background:#a93434}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.stat{background:#f0f6f2;border-radius:12px;padding:12px}.stat b{font-size:21px;display:block;color:var(--green)}.stat small{color:var(--muted)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}
+.tabs button{background:#e5eee8;color:#234b3b;padding:10px 4px;font-size:13px}.tabs button.active{background:var(--green);color:white}
+.section{display:none}.section.active{display:block}
+.item{padding:10px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.item:last-child{border:0}
+.item small{display:block;color:var(--muted);margin-top:3px}.amount{font-weight:700;white-space:nowrap}
+.pill{font-size:11px;background:#eaf3ed;color:#24523e;padding:4px 7px;border-radius:20px}
+.muted{color:var(--muted);font-size:12px}.notice{background:#fff7e4;border:1px solid #f0dfb4;padding:10px;border-radius:10px;font-size:12px;color:#6e541d}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}
+h2{font-size:17px;margin:0 0 8px}.empty{text-align:center;color:var(--muted);padding:18px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
+@media(min-width:600px){.stats{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>📚 দ্বীনিয়াত মক্তব ম্যানেজার</h1><p>একাধিক মক্তবের হিসাব—এক জায়গায়</p></div><span class="pill">ADMIN</span></div></header>
+<main>
+<div class="card">
+ <label>বর্তমান মক্তব নির্বাচন</label>
+ <div class="row"><select id="branchSelect"></select><button id="addBranchBtn" class="secondary" style="flex:0 0 auto">+ মক্তব</button></div>
+ <div class="muted" style="margin-top:7px">প্রতিটি মক্তবের আয়, ব্যয়, শিক্ষার্থী ও বইয়ের হিসাব আলাদা রাখা হবে।</div>
+</div>
+<div class="stats">
+ <div class="stat"><b id="incomeTotal">৳০</b><small>মোট আয়</small></div>
+ <div class="stat"><b id="expenseTotal">৳০</b><small>মোট ব্যয়</small></div>
+ <div class="stat"><b id="balanceTotal">৳০</b><small>বর্তমান উদ্বৃত্ত</small></div>
+ <div class="stat"><b id="studentTotal">০</b><small>শিক্ষার্থী</small></div>
+</div>
+<div class="tabs">
+ <button class="active" data-tab="entry">হিসাব এন্ট্রি</button>
+ <button data-tab="students">শিক্ষার্থী</button>
+ <button data-tab="books">বই বিক্রি</button>
+ <button data-tab="history">লেনদেন</button>
+ <button data-tab="reports">রিপোর্ট</button>
+ <button data-tab="attendance">উপস্থিতি পোস্ট</button>
+ <button data-tab="backup">ব্যাকআপ</button>
+</div>
+
+<section id="entry" class="section active">
+ <div class="card">
+  <h2>নতুন আয় / ব্যয় / জমা</h2>
+  <label>হিসাবের ধরন</label><select id="kind"><option value="income">আয় (বেতন/অনুদান)</option><option value="expense">ব্যয় (খরচ/বেতন)</option><option value="deposit">জমা / তহবিলে জমা</option></select>
+  <div class="row"><div><label>তারিখ</label><input id="txDate" type="date"></div><div><label>টাকার পরিমাণ</label><input id="txAmount" type="number" min="0" step="0.01" placeholder="যেমন ৫০০"></div></div>
+  <label>বিবরণ</label><input id="txNote" placeholder="যেমন অক্টোবর মাসের বেতন">
+  <label>যার কাছ থেকে / যাকে দেওয়া হয়েছে (ঐচ্ছিক)</label><input id="txPerson" placeholder="শিক্ষার্থী / শিক্ষক / দাতার নাম">
+  <button id="saveTx" style="width:100%;margin-top:12px">হিসাব সংরক্ষণ করুন</button>
+ </div>
+</section>
+
+<section id="students" class="section">
+ <div class="card"><h2>শিক্ষার্থী যোগ করুন</h2>
+  <label>শিক্ষার্থীর নাম</label><input id="stName" placeholder="নাম লিখুন">
+  <div class="row"><div><label>অভিভাবকের নাম</label><input id="stGuardian" placeholder="অভিভাবক"></div><div><label>মাসিক বেতন (৳)</label><input id="stFee" type="number" min="0" placeholder="যেমন ২০০"></div></div>
+  <label>মোবাইল / ঠিকানা (ঐচ্ছিক)</label><input id="stContact" placeholder="যোগাযোগের তথ্য">
+  <button id="saveStudent" style="width:100%;margin-top:12px">শিক্ষার্থী সংরক্ষণ</button>
+ </div><div class="card"><h2>শিক্ষার্থী তালিকা</h2><div id="studentList"></div></div>
+</section>
+
+<section id="books" class="section">
+ <div class="card"><h2>বই বিক্রি লিখুন</h2>
+  <label>বইয়ের নাম</label><input id="bookName" placeholder="যেমন নূরানী কায়দা">
+  <div class="row"><div><label>বিক্রয়মূল্য (৳)</label><input id="bookPrice" type="number" min="0" placeholder="১০০"></div><div><label>পরিমাণ</label><input id="bookQty" type="number" min="1" value="1"></div></div>
+  <label>ক্রেতার নাম (ঐচ্ছিক)</label><input id="bookBuyer" placeholder="শিক্ষার্থীর নাম">
+  <button id="saveBook" style="width:100%;margin-top:12px">বিক্রি সংরক্ষণ</button>
+ </div><div class="card"><h2>বই বিক্রির তালিকা</h2><div id="bookList"></div></div>
+</section>
+
+<section id="history" class="section"><div class="card"><h2>সাম্প্রতিক লেনদেন</h2><div id="txList"></div></div></section>
+<section id="reports" class="section"><div class="card"><h2>মক্তবের সারসংক্ষেপ</h2><div id="report"></div><button id="exportCsv" class="secondary" style="width:100%;margin-top:12px">Excel-এ খোলার জন্য CSV ডাউনলোড</button></div></section>
+<section id="attendance" class="section">
+ <div class="card">
+  <h2>দৈনিক উপস্থিতির পোস্ট তৈরি</h2>
+  <p class="muted">তথ্যগুলো লিখলেই ফেসবুকে পোস্ট করার মতো সুন্দর লেখা তৈরি হবে।</p>
+  <label>মক্তব নির্বাচন</label><select id="attBranch"></select>
+  <label>মক্তবের স্থান / মসজিদের নাম</label><input id="attPlace" placeholder="যেমন: গুড় পুকুর">
+  <label>তারিখ</label><input id="attDate" type="date">
+  <div class="row">
+   <div><label>ছাত্র সংখ্যা</label><input id="attBoys" type="number" min="0" value="0"></div>
+   <div><label>ছাত্রী সংখ্যা</label><input id="attGirls" type="number" min="0" value="0"></div>
+  </div>
+  <label>এ মাসে নতুন ভর্তি</label><input id="attNew" type="number" min="0" value="0">
+  <label>শিক্ষকের নাম</label><input id="attTeacher" value="শাহেদ আল মাহমুদ">
+  <button id="makeAttendance" style="width:100%;margin-top:12px">পোস্ট তৈরি করুন</button>
+ </div>
+ <div class="card">
+  <h2>পোস্টের লেখা</h2>
+  <textarea id="attendanceOutput" rows="12" style="width:100%;padding:12px;border:1px solid #ccd8d0;border-radius:10px;font:inherit;line-height:1.7" readonly placeholder="এখানে তৈরি পোস্ট দেখা যাবে"></textarea>
+  <button id="copyAttendance" style="width:100%;margin-top:10px">লেখা কপি করুন</button>
+  <div class="muted" style="margin-top:8px">কপি করার পর ফেসবুক পোস্টে পেস্ট করতে পারবেন।</div>
+ </div>
+</section>
+<section id="backup" class="section">
+ <div class="card"><h2>ডেটা ব্যাকআপ ও পুনরুদ্ধার</h2><p class="muted">ডেটা এই মোবাইলেই অফলাইনে থাকবে। নিয়মিত ব্যাকআপ ফাইল ডাউনলোড করে নিরাপদে রাখুন।</p>
+ <div class="actions"><button id="driveBackupBtn">Google Drive / ফোনে ব্যাকআপ</button><button id="driveRestoreBtn" class="secondary">Drive / ফোন থেকে ফিরিয়ে আনুন</button></div><div class="actions" style="margin-top:8px"><button id="backupBtn" class="secondary">JSON ফাইল ডাউনলোড</button><button id="restoreBtn" class="secondary">ফাইল থেকে ফিরিয়ে আনুন</button></div><p id="backupStatus" class="muted" style="margin-top:10px">সর্বশেষ ব্যাকআপ: এখনো নেওয়া হয়নি</p>
+ <input id="restoreFile" type="file" accept="application/json,.json" hidden>
+ <div class="notice" style="margin-top:12px">Google Drive / ফোনে ব্যাকআপ চাপলে Android ফাইল পিকার খুলবে। সেখানে Google Drive নির্বাচন করে ফাইলটি সংরক্ষণ করুন। এটি ম্যানুয়াল ব্যাকআপ; স্বয়ংক্রিয় ক্লাউড সিঙ্ক এখনো চালু নয়।</div>
+ </div>
+</section>
+<footer>দ্বীনিয়াত মক্তব ম্যানেজার • প্রাথমিক অফলাইন সংস্করণ</footer>
+</main>
+<script>
+const KEY='diniyat_maktab_v1';
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+let db=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{branches:[{id:'b1',name:'গুড় পুকুর মক্তব'},{id:'b2',name:'মথুরাপুর মক্তব'}],active:'b1',data:{}}}catch(e){return {branches:[{id:'b1',name:'গুড় পুকুর মক্তব'},{id:'b2',name:'মথুরাপুর মক্তব'}],active:'b1',data:{}}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function bucket(){if(!db.data[db.active])db.data[db.active]={transactions:[],students:[],books:[]};return db.data[db.active]}
+function money(n){return '৳'+Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2})}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ syncAttendanceBranches();
+ $('branchSelect').innerHTML=db.branches.map(b=>`<option value="${b.id}" ${b.id===db.active?'selected':''}>${escapeHtml(b.name)}</option>`).join('');
+ const d=bucket(), tx=d.transactions, income=tx.filter(x=>x.kind==='income').reduce((a,x)=>a+x.amount,0)+d.books.reduce((a,x)=>a+x.price*x.qty,0), expense=tx.filter(x=>x.kind==='expense').reduce((a,x)=>a+x.amount,0), deposits=tx.filter(x=>x.kind==='deposit').reduce((a,x)=>a+x.amount,0);
+ $('incomeTotal').textContent=money(income);$('expenseTotal').textContent=money(expense);$('balanceTotal').textContent=money(income-expense-deposits);$('studentTotal').textContent=d.students.length;
+ $('studentList').innerHTML=d.students.length?d.students.map(s=>`<div class="item"><div><b>${escapeHtml(s.name)}</b><small>অভিভাবক: ${escapeHtml(s.guardian||'—')} • ${escapeHtml(s.contact||'')}</small></div><div class="amount">${money(s.fee)}/মাস</div></div>`).join(''):'<div class="empty">এখনো শিক্ষার্থী যোগ করা হয়নি</div>';
+ $('bookList').innerHTML=d.books.length?d.books.slice().reverse().map(b=>`<div class="item"><div><b>${escapeHtml(b.name)}</b><small>${escapeHtml(b.buyer||'ক্রেতার নাম নেই')} • ${b.qty} কপি</small></div><div class="amount">${money(b.price*b.qty)}</div></div>`).join(''):'<div class="empty">এখনো বই বিক্রি যোগ করা হয়নি</div>';
+ $('txList').innerHTML=tx.length?tx.slice().reverse().map(t=>`<div class="item"><div><b>${escapeHtml(t.note)}</b><small>${t.date} • ${escapeHtml(t.person||'')} • ${t.kind==='income'?'আয়':t.kind==='expense'?'ব্যয়':'জমা'}</small></div><div class="amount">${money(t.amount)}</div></div>`).join(''):'<div class="empty">কোনো লেনদেন নেই</div>';
+ $('report').innerHTML=`<div class="item"><span>শিক্ষার্থীর সংখ্যা</span><b>${d.students.length}</b></div><div class="item"><span>বই বিক্রির মোট</span><b>${money(d.books.reduce((a,x)=>a+x.price*x.qty,0))}</b></div><div class="item"><span>মোট জমা</span><b>${money(deposits)}</b></div><div class="item"><span>মোট লেনদেন</span><b>${tx.length}</b></div><div class="item"><span>হিসাবের উদ্বৃত্ত (জমা বাদে)</span><b>${money(income-expense-deposits)}</b></div>`;
+}
+$('branchSelect').onchange=e=>{db.active=e.target.value;save()};
+$('addBranchBtn').onclick=()=>{let n=prompt('নতুন মক্তবের নাম লিখুন');if(n&&n.trim()){let id='b'+Date.now();db.branches.push({id,name:n.trim()});db.active=id;save()}};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.section').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab))});
+$('txDate').value=today();
+$('saveTx').onclick=()=>{let amount=Number($('txAmount').value);if(!amount||amount<0){alert('সঠিক টাকার পরিমাণ লিখুন');return}bucket().transactions.push({id:Date.now(),kind:$('kind').value,date:$('txDate').value||today(),amount,note:$('txNote').value.trim()||'বিবরণ নেই',person:$('txPerson').value.trim()});$('txAmount').value='';$('txNote').value='';$('txPerson').value='';save();alert('হিসাব সংরক্ষণ হয়েছে')};
+$('saveStudent').onclick=()=>{let name=$('stName').value.trim();if(!name){alert('শিক্ষার্থীর নাম লিখুন');return}bucket().students.push({id:Date.now(),name,guardian:$('stGuardian').value,fee:Number($('stFee').value)||0,contact:$('stContact').value});['stName','stGuardian','stFee','stContact'].forEach(x=>$(x).value='');save()};
+$('saveBook').onclick=()=>{let name=$('bookName').value.trim(),price=Number($('bookPrice').value),qty=Number($('bookQty').value);if(!name||price<0||!qty||qty<1){alert('বইয়ের নাম, মূল্য ও সঠিক পরিমাণ দিন');return}bucket().books.push({id:Date.now(),name,price,qty,buyer:$('bookBuyer').value,date:today()});bucket().transactions.push({id:Date.now()+1,kind:'income',date:today(),amount:price*qty,note:'বই বিক্রি: '+name,person:$('bookBuyer').value});['bookName','bookPrice','bookBuyer'].forEach(x=>$(x).value='');$('bookQty').value=1;save();alert('বই বিক্রি সংরক্ষণ হয়েছে')};
+$('backupBtn').onclick=()=>{let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='diniyat-maktab-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
+function updateBackupStatus(){const t=localStorage.getItem('diniyat_last_backup');$('backupStatus').textContent='সর্বশেষ ব্যাকআপ: '+(t||'এখনো নেওয়া হয়নি')}
+$('driveBackupBtn').onclick=()=>{if(window.MaktabAndroid){MaktabAndroid.saveBackup(JSON.stringify(db));}else{$('backupBtn').click();alert('এই সুবিধার জন্য Android APK ব্যবহার করুন।')}};
+$('driveRestoreBtn').onclick=()=>{if(window.MaktabAndroid){MaktabAndroid.restoreBackup();}else{$('restoreBtn').click();}};
+window.onNativeBackupSaved=()=>{localStorage.setItem('diniyat_last_backup',new Date().toLocaleString('bn-BD'));updateBackupStatus();alert('ব্যাকআপ সংরক্ষণ হয়েছে। Google Drive নির্বাচন করে থাকলে ফাইলটি Drive-এ আছে।')};
+window.onNativeBackupLoaded=(b64)=>{try{const raw=atob(b64),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0)),txt=new TextDecoder().decode(bytes),x=JSON.parse(txt);if(!x.branches||!x.data)throw Error('invalid');if(confirm('বর্তমান তথ্যের জায়গায় ব্যাকআপ বসাবেন?')){db=x;save();alert('ব্যাকআপ ফিরিয়ে আনা হয়েছে।')}}catch(e){alert('ব্যাকআপ ফাইলটি সঠিক নয় বা পড়া যাচ্ছে না।')}};
+updateBackupStatus();
+$('restoreBtn').onclick=()=>$('restoreFile').click();
+$('restoreFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x.branches||!x.data)throw Error();if(confirm('বর্তমান ডেটার জায়গায় ব্যাকআপ বসাবেন?')){db=x;save();alert('ব্যাকআপ ফিরিয়ে আনা হয়েছে')}}catch(err){alert('ব্যাকআপ ফাইলটি সঠিক নয়')}e.target.value=''};
+$('exportCsv').onclick=()=>{let d=bucket(),rows=[['তারিখ','ধরন','বিবরণ','ব্যক্তি','টাকা'],...d.transactions.map(t=>[t.date,t.kind,t.note,t.person,t.amount]),...d.books.map(b=>[b.date,'বই বিক্রি',b.name,b.buyer,b.price*b.qty])];let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='maktab-report-'+today()+'.csv';a.click();URL.revokeObjectURL(a.href)};
+
+function syncAttendanceBranches(){
+ const sel=$('attBranch'); if(!sel)return;
+ sel.innerHTML=db.branches.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
+ sel.value=db.active;
+}
+$('attDate').value=today();
+$('attBranch').addEventListener('change',()=>{
+ const b=db.branches.find(x=>x.id===$('attBranch').value);
+ if(b && !$('attPlace').value.trim()) $('attPlace').value=b.name;
+});
+$('makeAttendance').onclick=()=>{
+ const boys=Math.max(0,Number($('attBoys').value)||0), girls=Math.max(0,Number($('attGirls').value)||0);
+ const total=boys+girls, n=Math.max(0,Number($('attNew').value)||0);
+ const d=$('attDate').value||today();
+ const [y,m,day]=d.split('-').map(Number);
+ const dateObj=new Date(y,m-1,day);
+ const weekdays=['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
+ const dateText=`${String(day).padStart(2,'0')}/${String(m).padStart(2,'0')}/${String(y).slice(-2)}`;
+ const branch=db.branches.find(x=>x.id===$('attBranch').value);
+ const title=branch?branch.name:'দ্বীনিয়াত মক্তব';
+ const place=$('attPlace').value.trim();
+ const teacher=$('attTeacher').value.trim()||'—';
+ const newText=n===0?'নেই':`${n} জন`;
+ const lines=[
+ `📚 ${title}`,
+ place && place!==title ? `📍 ${place}` : '',
+ `📅 ${dateText} / ${weekdays[dateObj.getDay()]}`,
+ '',
+ `👦 ছাত্র সংখ্যা: ${boys} জন`,
+ `👧 ছাত্রী সংখ্যা: ${girls} জন`,
+ `👥 মোট উপস্থিতি: ${total} জন`,
+ `🆕 এ মাসে নতুন ভর্তি: ${newText}`,
+ `👨‍🏫 শিক্ষক: ${teacher}`
+ ].filter(Boolean);
+ $('attendanceOutput').value=lines.join('\n');
+};
+$('copyAttendance').onclick=async()=>{
+ const val=$('attendanceOutput').value;
+ if(!val){alert('আগে পোস্ট তৈরি করুন');return}
+ try{await navigator.clipboard.writeText(val);alert('পোস্টের লেখা কপি হয়েছে। এখন ফেসবুকে পেস্ট করুন।')}
+ catch(e){$('attendanceOutput').focus();$('attendanceOutput').select();try{document.execCommand('copy');alert('পোস্টের লেখা কপি হয়েছে।')}catch(_){alert('লেখাটি সিলেক্ট করে কপি করুন।')}}
+};
+
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+render();
+</script>
+</body></html>

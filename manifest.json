@@ -1,0 +1,9 @@
+{
+  "name": "দ্বীনিয়াত মক্তব ম্যানেজার",
+  "short_name": "মক্তব ম্যানেজার",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f3f6f4",
+  "theme_color": "#123d32",
+  "lang": "bn"
+}
